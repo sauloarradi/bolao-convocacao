@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bolão da Convocação - Seleção Brasileira</title>
+  <style>
+    :root {
+      --green: #159447;
+      --yellow: #f6d32d;
+      --blue: #174ea6;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #18202a;
+      --muted: #687385;
+      --danger: #d93025;
+      --border: #dfe5ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #f4f7fb 0%, #e8f3eb 100%);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      color: white;
+      padding: 32px 16px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 42px);
+    }
+
+    header p {
+      margin: 0;
+      color: rgba(255,255,255,0.9);
+      font-size: 16px;
+    }
+
+    main {
+      width: min(1100px, 100%);
+      margin: -24px auto 40px;
+      padding: 0 16px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(17, 24, 39, 0.12);
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 14px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.16);
+    }
+
+    .counter {
+      min-width: 170px;
+      text-align: center;
+      border-radius: 16px;
+      background: #f1f8f4;
+      border: 1px solid #cfe9d9;
+      padding: 14px;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .counter span {
+      display: block;
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .positions {
+      display: grid;
+      gap: 18px;
+    }
+
+    .position-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .position-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      background: #f7f9fc;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .position-title h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--blue);
+    }
+
+    .position-total {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .players {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .player {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      user-select: none;
+    }
+
+    .player:hover {
+      transform: translateY(-1px);
+      border-color: #b8c6d9;
+    }
+
+    .player.selected {
+      background: #fffbe6;
+      border-color: var(--yellow);
+    }
+
+    .player input {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+
+    .player strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .player small {
+      display: block;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 13px 18px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: opacity 0.12s ease, transform 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-whatsapp {
+      background: #25d366;
+      color: white;
+    }
+
+    .btn-clear {
+      background: #eef2f7;
+      color: var(--text);
+    }
+
+    .status {
+      flex: 1;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status.error {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 20px 16px 36px;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .counter {
+        width: 100%;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .status {
+        flex-basis: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bolão da Convocação</h1>
+    <p>Escolha até 26 jogadores da pré-lista da Seleção Brasileira e envie seu palpite pelo WhatsApp.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="topbar">
+        <div class="field">
+          <label for="nome">Seu nome</label>
+          <input id="nome" type="text" placeholder="Ex.: Samuel" autocomplete="name" />
+          <div class="hint">A lista será enviada organizada por posição.</div>
+        </div>
+
+        <div class="counter" aria-live="polite">
+          <span id="contador">0</span>
+          de 26 escolhidos
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div id="lista" class="positions"></div>
+
+      <div class="actions">
+        <div id="status" class="status">Marque exatamente 26 jogadores para liberar o envio.</div>
+        <button class="btn-clear" type="button" id="limpar">Limpar escolhas</button>
+        <button class="btn-whatsapp" type="button" id="enviar" disabled>Enviar pelo WhatsApp</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Pré-lista de 55 jogadores organizada por posição e ordem alfabética.
+  </footer>
+
+  <script>
+    const LIMITE = 26;
+
+    const jogadores = [
+      {
+        posicao: "Goleiros",
+        nomes: [
+          ["Alisson", "Liverpool"],
+          ["Bento", "Al-Nassr"],
+          ["Ederson", "Fenerbahçe"],
+          ["Hugo Souza", "Corinthians"],
+          ["John", "Nottingham Forest"],
+          ["Weverton", "Grêmio"]
+        ]
+      },
+      {
+        posicao: "Defensores",
+        nomes: [
+          ["Alex Sandro", "Flamengo"],
+          ["Alexsandro Ribeiro", "Lille"],
+          ["Bremer", "Juventus"],
+          ["Carlos Augusto", "Inter de Milão"],
+          ["Danilo", "Flamengo"],
+          ["Douglas Santos", "Zenit"],
+          ["Fabricio Bruno", "Cruzeiro"],
+          ["Gabriel Magalhães", "Arsenal"],
+          ["Ibañez", "Al-Ahli"],
+          ["Kaiki Bruno", "Cruzeiro"],
+          ["Leo Ortiz", "Flamengo"],
+          ["Leo Pereira", "Flamengo"],
+          ["Luciano Juba", "Bahia"],
+          ["Marquinhos", "PSG"],
+          ["Natan", "Betis"],
+          ["Paulo Henrique", "Vasco"],
+          ["Thiago Silva", "Porto"],
+          ["Vitinho", "Botafogo"],
+          ["Vitor Reis", "Girona"],
+          ["Wesley", "Roma"]
+        ]
+      },
+      {
+        posicao: "Meio-campo",
+        nomes: [
+          ["Andreas Pereira", "Palmeiras"],
+          ["Andrey Santos", "Chelsea"],
+          ["Bruno Guimarães", "Newcastle"],
+          ["Casemiro", "Manchester United"],
+          ["Danilo", "Botafogo"],
+          ["Ederson", "Atalanta"],
+          ["Fabinho", "Al-Ittihad"],
+          ["Gabriel Sara", "Galatasaray"],
+          ["Gerson", "Cruzeiro"],
+          ["João Gomes", "Wolverhampton"],
+          ["Lucas Paquetá", "Flamengo"],
+          ["Matheus Pereira", "Cruzeiro"]
+        ]
+      },
+      {
+        posicao: "Atacantes",
+        nomes: [
+          ["Antony", "Betis"],
+          ["Endrick", "Lyon"],
+          ["Gabriel Jesus", "Arsenal"],
+          ["Gabriel Martinelli", "Arsenal"],
+          ["Igor Jesus", "Nottingham Forest"],
+          ["Igor Thiago", "Brentford"],
+          ["João Pedro", "Chelsea"],
+          ["Kaio Jorge", "Cruzeiro"],
+          ["Luiz Henrique", "Zenit"],
+          ["Matheus Cunha", "Manchester United"],
+          ["Neymar", "Santos"],
+          ["Pedro", "Flamengo"],
+          ["Raphinha", "Barcelona"],
+          ["Rayan", "Bournemouth"],
+          ["Richarlison", "Tottenham"],
+          ["Samuel Lino", "Flamengo"],
+          ["Vini Jr", "Real Madrid"]
+        ]
+      }
+    ];
+
+    const lista = document.getElementById("lista");
+    const contador = document.getElementById("contador");
+    const statusEl = document.getElementById("status");
+    const enviar = document.getElementById("enviar");
+    const limpar = document.getElementById("limpar");
+    const nome = document.getElementById("nome");
+
+    function normalizarTexto(texto) {
+      return texto.localeCompare ? texto : String(texto);
+    }
+
+    function renderizarJogadores() {
+      lista.innerHTML = "";
+
+      jogadores.forEach((grupo) => {
+        const section = document.createElement("section");
+        section.className = "position-card";
+
+        const header = document.createElement("div");
+        header.className = "position-title";
+        header.innerHTML = `<h2>${grupo.posicao}</h2><span class="position-total">${grupo.nomes.length} jogadores</span>`;
+
+        const grid = document.createElement("div");
+        grid.className = "players";
+
+        grupo.nomes
+          .slice()
+          .sort((a, b) => a[0].localeCompare(b[0], "pt-BR"))
+          .forEach(([jogador, clube]) => {
+            const id = `${grupo.posicao}-${jogador}`.replace(/\s+/g, "-").toLowerCase();
+            const label = document.createElement("label");
+            label.className = "player";
+            label.setAttribute("for", id);
+            label.innerHTML = `
+              <input type="checkbox" id="${id}" data-posicao="${grupo.posicao}" data-jogador="${jogador}" data-clube="${clube}" />
+              <span>
+                <strong>${jogador}</strong>
+                <small>${clube}</small>
+              </span>
+            `;
+            grid.appendChild(label);
+          });
+
+        section.appendChild(header);
+        section.appendChild(grid);
+        lista.appendChild(section);
+      });
+    }
+
+    function selecionados() {
+      return Array.from(document.querySelectorAll("input[type='checkbox']:checked"));
+    }
+
+    function atualizarTela() {
+      const total = selecionados().length;
+      contador.textContent = total;
+      enviar.disabled = total !== LIMITE;
+
+      document.querySelectorAll(".player").forEach((label) => {
+        const checkbox = label.querySelector("input");
+        label.classList.toggle("selected", checkbox.checked);
+      });
+
+      if (total === LIMITE) {
+        statusEl.textContent = "Lista completa! Agora você já pode enviar pelo WhatsApp.";
+        statusEl.classList.remove("error");
+      } else if (total > LIMITE) {
+        statusEl.textContent = `Você selecionou ${total}. O limite é ${LIMITE}.`;
+        statusEl.classList.add("error");
+      } else {
+        statusEl.textContent = `Faltam ${LIMITE - total} jogador(es) para completar sua lista.`;
+        statusEl.classList.remove("error");
+      }
+    }
+
+    function tratarSelecao(event) {
+      const checkbox = event.target;
+      if (checkbox.type !== "checkbox") return;
+
+      const totalAntesDoClique = selecionados().length;
+
+      if (checkbox.checked && totalAntesDoClique > LIMITE) {
+        checkbox.checked = false;
+        alert("O número limite de 26 jogadores foi atingido. Caso queira fazer alguma alteração, desmarque algum jogador escolhido anteriormente.");
+      }
+
+      atualizarTela();
+    }
+
+    function montarMensagem() {
+      const nomePalpiteiro = nome.value.trim() || "Participante";
+      const linhas = [`🇧🇷 Bolão da Convocação - Palpite de ${nomePalpiteiro}`, ""];
+
+      jogadores.forEach((grupo) => {
+        const escolhidosDaPosicao = selecionados()
+          .filter((item) => item.dataset.posicao === grupo.posicao)
+          .map((item) => `- ${item.dataset.jogador} (${item.dataset.clube})`)
+          .sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+        if (escolhidosDaPosicao.length) {
+          linhas.push(`${grupo.posicao}:`);
+          linhas.push(...escolhidosDaPosicao);
+          linhas.push("");
+        }
+      });
+
+      linhas.push(`Total: ${selecionados().length}/26 jogadores`);
+      return linhas.join("\n");
+    }
+
+    function enviarWhatsapp() {
+      const total = selecionados().length;
+
+      if (total !== LIMITE) {
+        alert(`Você precisa selecionar exatamente ${LIMITE} jogadores antes de enviar.`);
+        return;
+      }
+
+      const texto = encodeURIComponent(montarMensagem());
+      window.open(`https://wa.me/?text=${texto}`, "_blank", "noopener,noreferrer");
+    }
+
+    function limparEscolhas() {
+      document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+      atualizarTela();
+    }
+
+    renderizarJogadores();
+    lista.addEventListener("change", tratarSelecao);
+    enviar.addEventListener("click", enviarWhatsapp);
+    limpar.addEventListener("click", limparEscolhas);
+    atualizarTela();
+  </script>
+</body>
+</html>
