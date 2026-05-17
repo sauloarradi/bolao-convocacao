@@ -26,6 +26,7 @@
       font-family: Arial, Helvetica, sans-serif;
       background: linear-gradient(135deg, #f4f7fb 0%, #e8f3eb 100%);
       color: var(--text);
+      padding-bottom: 92px;
     }
 
     header {
@@ -247,6 +248,56 @@
       font-weight: 700;
     }
 
+    .fixed-submit-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.96);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -10px 30px rgba(17, 24, 39, 0.16);
+      padding: 12px 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .fixed-submit-content {
+      width: min(1100px, 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .fixed-counter {
+      font-weight: 900;
+      color: var(--blue);
+      font-size: 16px;
+    }
+
+    .fixed-counter strong {
+      display: inline-block;
+      min-width: 56px;
+      color: var(--green);
+      font-size: 22px;
+    }
+
+    .fixed-counter.complete strong {
+      color: var(--green);
+    }
+
+    .fixed-counter.incomplete strong {
+      color: var(--danger);
+    }
+
+    .fixed-hint {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
     footer {
       text-align: center;
       color: var(--muted);
@@ -273,6 +324,15 @@
 
       .status {
         flex-basis: 100%;
+      }
+
+      .fixed-submit-content {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .fixed-submit-bar .btn-whatsapp {
+        width: 100%;
       }
     }
   </style>
@@ -309,6 +369,18 @@
       </div>
     </section>
   </main>
+
+  <div class="fixed-submit-bar">
+    <div class="fixed-submit-content">
+      <div>
+        <div id="contadorFixo" class="fixed-counter incomplete">
+          Selecionados: <strong>0/26</strong>
+        </div>
+        <div id="dicaFixa" class="fixed-hint">Selecione exatamente 26 jogadores para enviar.</div>
+      </div>
+      <button class="btn-whatsapp" type="button" id="enviarFixo" disabled>Enviar pelo WhatsApp</button>
+    </div>
+  </div>
 
   <footer>
     Pré-lista de 55 jogadores organizada por posição e ordem alfabética.
@@ -399,6 +471,9 @@
     const contador = document.getElementById("contador");
     const statusEl = document.getElementById("status");
     const enviar = document.getElementById("enviar");
+    const enviarFixo = document.getElementById("enviarFixo");
+    const contadorFixo = document.getElementById("contadorFixo");
+    const dicaFixa = document.getElementById("dicaFixa");
     const limpar = document.getElementById("limpar");
     const nome = document.getElementById("nome");
 
@@ -452,6 +527,10 @@
       const total = selecionados().length;
       contador.textContent = total;
       enviar.disabled = total !== LIMITE;
+      enviarFixo.disabled = total !== LIMITE;
+      contadorFixo.querySelector("strong").textContent = `${total}/${LIMITE}`;
+      contadorFixo.classList.toggle("complete", total === LIMITE);
+      contadorFixo.classList.toggle("incomplete", total !== LIMITE);
 
       document.querySelectorAll(".player").forEach((label) => {
         const checkbox = label.querySelector("input");
@@ -460,12 +539,15 @@
 
       if (total === LIMITE) {
         statusEl.textContent = "Lista completa! Agora você já pode enviar pelo WhatsApp.";
+        dicaFixa.textContent = "Lista completa. Pode enviar seu palpite.";
         statusEl.classList.remove("error");
       } else if (total > LIMITE) {
         statusEl.textContent = `Você selecionou ${total}. O limite é ${LIMITE}.`;
+        dicaFixa.textContent = `Você passou do limite de ${LIMITE} jogadores.`;
         statusEl.classList.add("error");
       } else {
         statusEl.textContent = `Faltam ${LIMITE - total} jogador(es) para completar sua lista.`;
+        dicaFixa.textContent = `Faltam ${LIMITE - total} jogador(es) para liberar o envio.`;
         statusEl.classList.remove("error");
       }
     }
@@ -509,7 +591,7 @@
       const total = selecionados().length;
 
       if (total !== LIMITE) {
-        alert(`Você precisa selecionar exatamente ${LIMITE} jogadores antes de enviar.`);
+        alert(`Você precisa selecionar exatamente ${LIMITE} jogadores antes de enviar. Atualmente você selecionou ${total}.`);
         return;
       }
 
@@ -527,6 +609,7 @@
     renderizarJogadores();
     lista.addEventListener("change", tratarSelecao);
     enviar.addEventListener("click", enviarWhatsapp);
+    enviarFixo.addEventListener("click", enviarWhatsapp);
     limpar.addEventListener("click", limparEscolhas);
     atualizarTela();
   </script>
